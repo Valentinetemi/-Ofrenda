@@ -241,18 +241,28 @@ def dedupe_extraction(extraction: Extraction) -> Extraction:
     return Extraction(people=people, relationships=relationships)
 
 
-def extract_story(story: str, complete: Completer) -> Extraction:
+def extract_story(story: str, complete: Completer, attempts: int = 3) -> Extraction:
     text = story.strip()
     if not text:
         raise ExtractionError("Tell a little of the story first.")
-    try:
-        raw = complete(story_prompt(text))
-    except Exception as exc:
-        raise ExtractionError(f"The storyteller could not be reached. {exc}") from exc
-    try:
-        return validate_extraction(parse_json_object(raw))
-    except (ExtractionError, JsonPayloadError) as exc:
-        raise ExtractionError(
-            f"I couldn't read that story ({exc}). "
-            "Try one relationship at a time: who was whose parent, spouse, or sibling."
-        ) from exc
+    if attempts < 1:
+        raise ExtractionError("No attempts left.")
+
+    prompt = story_prompt(text)
+    last_error = "empty reply"
+    raw = ""
+    for attempt in range(attempts):
+        try:
+            raw = complete(prompt)
+        except Exception as exc:
+            raise ExtractionError(f"The storyteller could not be reached. {exc}") from exc
+        try:
+            return validate_extraction(parse_json_object(raw))
+        except (ExtractionError, JsonPayloadError) as exc:
+            last_error = str(exc)
+            prompt = repair_prompt(text, raw or "", last_error)
+    raise ExtractionError(
+        "I couldn't read that story after "
+        f"{attempts} tries ({last_error}). "
+        "Try one relationship at a time: who was whose parent, spouse, or sibling."
+    )

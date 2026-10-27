@@ -1,0 +1,132 @@
+{
+  "narrator_id": "seyi",
+  "sample": true,
+  "people": [
+    {
+      "id": "ireti",
+      "name": "Mama Ireti Adeyemi",
+      "origin": "Ogbomoso",
+      "birth_year": 1924,
+      "death_year": 1998,
+      "gender": "female",
+      "bio": "She kept the family in her head: births, quarrels, and who owed whom a visit.",
+      "memories": [
+        "She sold oranges by the mosque and knew every child on the street by name."
+      ],
+      "photo": "ireti.png",
+      "parent_ids": [],
+      "spouse_ids": [],
+      "sibling_ids": []
+    },
+    {
+      "id": "ayo",
+      "name": "Baba Ayo Adeyemi",
+      "origin": "Ogbomoso",
+      "birth_year": 1946,
+      "death_year": 2015,
+      "gender": "male",
+      "bio": "A tailor. People still describe cloth by the way he would have cut it.",
+      "memories": [
+        "He kept buttons in a tobacco tin and hummed highlife while he sewed."
+      ],
+      "photo": "ayo.png",
+      "parent_ids": ["ireti"],
+      "spouse_ids": ["folake"],
+      "sibling_ids": ["tunde"]
+    },
+    {
+      "id": "tunde",
+      "name": "Tunde Adeyemi",
+      "origin": "Accra",
+      "birth_year": 1948,
+      "death_year": null,
+      "gender": "male",
+      "bio": "Moved to Ghana. The family has his name, and not much else.",
+      "memories": [],
+      "photo": "tunde.png",
+      "parent_ids": ["ireti"],
+      "spouse_ids": [],
+      "sibling_ids": ["ayo"]
+    },
+    {
+      "id": "folake",
+      "name": "Mama Folake Adeyemi",
+      "origin": "Ibadan",
+      "birth_year": 1949,
+      "death_year": 2019,
+      "gender": "female",
+      "bio": "She ran the house in Ibadan and did not take corrections on her cooking.",
+      "memories": [
+        "Her jollof was a little sweet, and she would not apologise for it."
+      ],
+      "photo": "folake.png",
+      "parent_ids": [],
+      "spouse_ids": ["ayo"],
+      "sibling_ids": []
+    },
+    {
+      "id": "funke",
+      "name": "Funke Adeyemi",
+      "origin": "Lagos",
+      "birth_year": 1972,
+      "death_year": null,
+      "gender": "female",
+      "bio": "Daughter of Ayo and Folake. She is who the younger ones call when a name is missing.",
+      "memories": [
+        "She still ties her gele the way Folake taught her, even on an ordinary Sunday."
+      ],
+      "photo": "funke.png",
+      "parent_ids": ["ayo", "folake"],
+      "spouse_ids": ["kola"],
+      "sibling_ids": []
+    },
+    {
+      "id": "kola",
+      "name": "Kola Balogun",
+      "origin": "Lagos",
+      "birth_year": 1970,
+      "death_year": null,
+      "gender": "male",
+      "bio": "Funke's husband. His own parents have not been written down.",
+      "memories": [
+        "He starts laughing before the joke is finished."
+      ],
+      "photo": "kola.png",
+      "parent_ids": [],
+      "spouse_ids": ["funke"],
+      "sibling_ids": []
+    },
+    {
+      "id": "bisi",
+      "name": "Bisi Adeyemi",
+      "origin": "Ibadan",
+      "birth_year": 1975,
+      "death_year": null,
+      "gender": "female",
+      "bio": "Funke's sister. She is the one who notices when a name is about to be lost.",
+      "memories": [
+        "She writes names in the back of her bible when a baby is born, so nobody has to argue later."
+      ],
+      "photo": "bisi.png",
+      "parent_ids": ["ayo", "folake"],
+      "spouse_ids": [],
+      "sibling_ids": []
+    },
+    {
+      "id": "seyi",
+      "name": "Seyi Balogun",
+      "origin": "Lagos",
+      "birth_year": 1999,
+      "death_year": null,
+      "gender": null,
+      "bio": "Keeps this ofrenda, and is still learning which questions to ask.",
+      "memories": [
+        "Seyi started this altar so a story would have somewhere to sit."
+      ],
+      "photo": "seyi.png",
+      "parent_ids": ["funke", "kola"],
+      "spouse_ids": [],
+      "sibling_ids": []
+    }
+  ]
+}

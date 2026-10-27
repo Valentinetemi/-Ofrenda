@@ -14,6 +14,7 @@ from starlette.staticfiles import StaticFiles
 
 from ofrenda.config import ROOT, Settings, get_settings
 from ofrenda.extract import ExtractionError, extract_story
+from ofrenda.ghost import GHOST_VERSION, MOTION
 from ofrenda.llm import StorytellerError, completer_for, ollama_status
 from ofrenda.merge import (
     describe_merge,
@@ -27,6 +28,7 @@ from ofrenda.merge import (
 from ofrenda.names import display_name, normalize_name
 from ofrenda.schemas import FamilyTree, Person
 from ofrenda.seed import ensure_seed, reset_to_sample
+from ofrenda.segment import ghost_sprite, mediapipe_runtime_status
 from ofrenda.store import Store
 from ofrenda.suggest import review_with_model, suggestions_from_tree
 
@@ -109,9 +111,11 @@ def _public_person(settings: Settings, person: Person) -> dict:
     photo = _portrait_path(settings, person)
     if photo and photo.is_file():
         payload["photo_url"] = f"/api/people/{person.id}/photo"
+        payload["ghost_url"] = f"/api/people/{person.id}/ghost.png"
         payload["photo_mtime"] = photo.stat().st_mtime_ns
     else:
         payload["photo_url"] = None
+        payload["ghost_url"] = None
         payload["photo_mtime"] = None
     return payload
 
@@ -143,19 +147,27 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.store = Store(settings.tree_path)
     app.state.review_cache = {}
+    app.state.segmenter_status = None
 
     def store() -> Store:
         return app.state.store
 
     @app.get("/api/health")
     def health():
+        if app.state.segmenter_status is None:
+            app.state.segmenter_status = mediapipe_runtime_status(settings.segmenter_model)
         status = ollama_status(settings)
         status["ok"] = True
+        status["segmenter"] = app.state.segmenter_status
         return status
 
     @app.get("/api/tree")
     def get_tree():
         return _public_tree(settings, store().load())
+
+    @app.get("/api/ghost/motion")
+    def ghost_motion():
+        return MOTION
 
     @app.get("/api/suggestions")
     def suggestions():
@@ -282,6 +294,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         photo = _portrait_path(settings, person)
         if photo and photo.is_file():
             photo.unlink()
+        _clear_ghost_cache(settings, person_id)
         app.state.review_cache.clear()
         return {"ok": True}
 
@@ -352,6 +365,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             person.photo = filename
 
         store().update(apply)
+        _clear_ghost_cache(settings, person_id)
         return _public_person(settings, next(p for p in store().load().people if p.id == person_id))
 
     @app.get("/api/people/{person_id}/photo")
@@ -362,6 +376,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if path is None or not path.is_file():
             raise HTTPException(status_code=404, detail="No photograph yet.")
         return FileResponse(path, media_type="image/png")
+
+    @app.get("/api/people/{person_id}/ghost.png")
+    def get_ghost(person_id: str):
+        tree = store().load()
+        person = _find(tree, person_id)
+        path = _portrait_path(settings, person)
+        if path is None or not path.is_file():
+            raise HTTPException(status_code=404, detail="Add a photograph before sitting with them.")
+        png, method = _cached_ghost(settings, person_id, path)
+        return Response(
+            content=png,
+            media_type="image/png",
+            headers={"X-Segmenter": method, "Cache-Control": "no-store"},
+        )
 
     @app.post("/api/reset")
     def reset():
@@ -378,6 +406,36 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return FileResponse(static_dir / "index.html")
 
     return app
+
+
+def _clear_ghost_cache(settings: Settings, person_id: str) -> None:
+    cache = settings.cache_dir
+    if not cache.is_dir():
+        return
+    for path in cache.glob(f"{person_id}.*"):
+        path.unlink(missing_ok=True)
+
+
+def _cached_ghost(settings: Settings, person_id: str, photo: Path) -> tuple[bytes, str]:
+    from PIL import Image
+
+    settings.cache_dir.mkdir(parents=True, exist_ok=True)
+    stamp = f"{GHOST_VERSION}:{photo.stat().st_mtime_ns}:{photo.stat().st_size}"
+    sprite_path = settings.cache_dir / f"{person_id}.png"
+    meta_path = settings.cache_dir / f"{person_id}.txt"
+    if sprite_path.is_file() and meta_path.is_file():
+        lines = meta_path.read_text(encoding="utf-8").splitlines()
+        if lines and lines[0] == stamp:
+            method = lines[1] if len(lines) > 1 else "cached"
+            return sprite_path.read_bytes(), method
+    image = Image.open(photo)
+    sprite, method = ghost_sprite(image, settings.segmenter_model)
+    buffer = io.BytesIO()
+    sprite.save(buffer, format="PNG")
+    data = buffer.getvalue()
+    sprite_path.write_bytes(data)
+    meta_path.write_text(f"{stamp}\n{method}\n", encoding="utf-8")
+    return data, method
 
 
 app = create_app()

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ofrenda — Remember me</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%2310080c' width='32' height='32'/%3E%3Cpath d='M16 4c2 4 2 6 0 8 3-1 6 1 6 5 0 5-3 9-6 11-3-2-6-6-6-11 0-4 3-6 6-5-2-2-2-4 0-8z' fill='%23ffb703'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#story">Skip to the story</a>
+  <div class="picado" aria-hidden="true">
+    <svg viewBox="0 0 1200 52" preserveAspectRatio="none">
+      <g>
+        <path d="M8 0h84v34L50 48 8 34z" fill="#e4a23a"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(100)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#c4491d"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(200)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#f6edd8"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(300)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#7a2f4a"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(400)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#e4a23a"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(500)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#1f6f6a"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(600)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#f6edd8"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(700)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#c4491d"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(800)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#e4a23a"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(900)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#7a2f4a"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(1000)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#f6edd8"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+      <g transform="translate(1100)">
+        <path d="M8 0h84v34L50 48 8 34z" fill="#e4a23a"/>
+        <circle cx="50" cy="16" r="5" fill="#10080c"/>
+        <circle cx="32" cy="18" r="3.5" fill="#10080c"/>
+        <circle cx="68" cy="18" r="3.5" fill="#10080c"/>
+      </g>
+    </svg>
+  </div>
+
+  <header class="mast">
+    <p class="kicker">Día de los Muertos · on this computer</p>
+    <h1>Ofrenda</h1>
+    <p class="tagline">Remember me</p>
+    <p id="status" class="status">Lighting the candles…</p>
+  </header>
+
+  <main>
+    <section class="paper" id="story">
+      <div class="paper-head">
+        <h2>Tell it about your family</h2>
+        <p>Plain words are enough. Who was whose parent, who moved, where they were from.</p>
+      </div>
+      <form id="story-form">
+        <label class="visually-hidden" for="story-text">Family story</label>
+        <textarea id="story-text" name="text" rows="4" placeholder="My mum is Funke, her dad was Baba Ayo from Ogbomoso, he had a brother Tunde who moved to Ghana."></textarea>
+        <div class="paper-actions">
+          <button type="submit" class="btn solid" id="story-submit">Set them on the altar</button>
+          <button type="button" class="btn ghost" id="add-person">Add someone by hand</button>
+        </div>
+      </form>
+      <p id="story-message" class="message" role="status"></p>
+      <p class="fine">The Adeyemi family already here is fictional, so you can try the altar before you type a real name. Stories that say “my” attach to the keeper of the altar. Rename them if this ofrenda is yours.</p>
+    </section>
+
+    <section class="altar-section" aria-labelledby="altar-heading">
+      <div class="section-head">
+        <h2 id="altar-heading">The altar</h2>
+        <p>The oldest sit highest. Click a frame to add a memory, a photograph, or a missing link.</p>
+      </div>
+      <div id="altar" class="altar"></div>
+    </section>
+
+    <section class="gaps" aria-labelledby="gaps-heading">
+      <div class="section-head">
+        <h2 id="gaps-heading">Missing branches</h2>
+        <p id="gaps-lead">Places the record goes thin. A candle is a question for someone older, not a guess.</p>
+      </div>
+      <ul id="candles" class="candles"></ul>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p>Family stories and photographs stay in the <code>data</code> folder on this machine. Nothing is sent to a cloud.</p>
+    <button type="button" class="text-btn" id="reset">Restore the fictional sample</button>
+  </footer>
+
+  <div id="scrim" class="scrim" hidden></div>
+  <aside id="drawer" class="drawer" hidden aria-labelledby="drawer-title"></aside>
+
+  <div id="ghost" class="ghost-layer" hidden>
+    <canvas id="ghost-canvas"></canvas>
+    <div class="ghost-ui">
+      <button type="button" class="btn ghost close-ghost" id="ghost-close">Close</button>
+      <p id="ghost-kicker" class="ghost-kicker"></p>
+      <figure class="memory-slip" id="memory-slip">
+        <blockquote id="memory-text"></blockquote>
+        <figcaption id="memory-who"></figcaption>
+        <button type="button" class="text-btn" id="memory-next" hidden>Another memory</button>
+      </figure>
+      <p id="segmenter-note" class="segmenter-note"></p>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/main.js"></script>
+</body>
+</html>

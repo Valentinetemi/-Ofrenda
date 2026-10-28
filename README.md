@@ -158,7 +158,7 @@ docs/DEV_POST.md  draft post for the DEV challenge
 - [FastAPI](https://fastapi.tiangolo.com/), Uvicorn, Pydantic, Pillow, NumPy, httpx, pytest.
 - The idea of the fading ancestor is from Pixar's *Coco*. No Pixar art, audio, or characters are used. The marigolds, the candles, and the papel picado at the top of the page are drawn in this repo.
 
-This project is MIT licensed. See [LICENSE](LICENSE).
+This project is MIT licensed. See [LICENSE](LICENSE)
 
 ## The challenge
 

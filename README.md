@@ -1,5 +1,7 @@
 # Ofrenda
 
+Oríkì: an offline AI archive for your African family's memory.
+
 **Remember me.**
 
 Ofrenda is a small altar you run on your own laptop. You tell it about your family in ordinary words. A local Gemma model reads the story and sets the people on a tree: who was whose parent, who moved away, where they were from. You can correct it, add a photograph, and write the short memory you are afraid of forgetting.

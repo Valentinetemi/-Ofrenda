@@ -16,17 +16,25 @@ MOTION = {
     "amplitude_px": 10,
     "period_s": 3.2,
     "drift": 0.28,
-    "opacity": 0.78,
+    "opacity": 0.30,
     "scale": 0.74,
     "side": "right",
+    # A faint memory: it comes up slowly, then breathes like candlelight.
+    "fade_in_s": 2.5,
+    "flicker": 0.12,
+    "flicker_period_s": 2.6,
 }
 
 # Bump when the treatment changes so cached sprites are rebuilt.
-GHOST_VERSION = 1
+GHOST_VERSION = 2
 
 # Marigold, the flower on the altar.
 GLOW_RGB = (255, 168, 64)
 WARM_RGB = (255, 228, 196)
+# Old-photograph brown. The figure is drawn in this tone, not its own colours.
+SEPIA_RGB = (236, 205, 160)
+SEPIA_KEEP = 0.12  # how much of the photo's own colour survives
+HALO_STRENGTH = 0.3
 HALO_PAD = 18
 
 
@@ -49,6 +57,19 @@ def feather_mask(mask: np.ndarray, radius: float = 2.0) -> np.ndarray:
     return np.asarray(blurred).astype(np.float32) / 255.0
 
 
+def sepia_tone(rgb: np.ndarray) -> np.ndarray:
+    """Desaturate to a warm brown, so the figure is a memory and not a sticker.
+
+    `rgb` is float, last axis 3, 0–255. Luminance is lifted a little because the
+    figure is shown at low opacity and would otherwise vanish on a dark room.
+    """
+    luma = rgb[..., 0] * 0.299 + rgb[..., 1] * 0.587 + rgb[..., 2] * 0.114
+    luma = np.clip(255.0 * 1.45 * np.power(np.clip(luma / 255.0, 0.0, 1.0), 0.6), 0, 255)
+    tint = np.array(SEPIA_RGB, dtype=np.float32) / 255.0
+    toned = luma[..., None] * tint
+    return np.clip(toned * (1.0 - SEPIA_KEEP) + rgb * SEPIA_KEEP, 0, 255)
+
+
 def _pad(image: Image.Image, pad: int) -> Image.Image:
     """Room around the figure so the halo is not clipped by the photo edge."""
     canvas = Image.new("RGBA", (image.width + pad * 2, image.height + pad * 2), (0, 0, 0, 0))
@@ -68,14 +89,14 @@ def _over(base: np.ndarray, sprite: np.ndarray) -> np.ndarray:
 
 
 def apply_ghost_treatment(image: Image.Image, opacity: float | None = None) -> Image.Image:
-    """Translucent figure, a little candle-warm, with a soft marigold ring.
+    """Faint sepia figure with a barely-there marigold glow.
 
     Steps:
     1. Pad the cut-out so the glow has somewhere to live.
     2. Dilate the alpha and subtract the body, leaving a ring.
     3. Blur that ring and colour it marigold.
-    4. Pull the figure's colour a little toward warm white, then lower its alpha
-       so the room (or the webcam) shows through the chest and the face.
+    4. Turn the figure sepia, then lower its alpha so the room (or the webcam)
+       shows through the chest and the face.
     5. Composite the figure over the ring. The face stays the face.
     """
     if opacity is None:
@@ -89,7 +110,7 @@ def apply_ghost_treatment(image: Image.Image, opacity: float | None = None) -> I
     )
     ring = np.clip(dilated - alpha, 0, 255)
     ring_alpha = (
-        np.asarray(Image.fromarray(ring.astype(np.uint8), "L").filter(ImageFilter.GaussianBlur(radius=4))).astype(
+        np.asarray(Image.fromarray(ring.astype(np.uint8), "L").filter(ImageFilter.GaussianBlur(radius=6))).astype(
             np.float32
         )
         / 255.0
@@ -99,11 +120,10 @@ def apply_ghost_treatment(image: Image.Image, opacity: float | None = None) -> I
     glow[:, :, 0] = GLOW_RGB[0]
     glow[:, :, 1] = GLOW_RGB[1]
     glow[:, :, 2] = GLOW_RGB[2]
-    glow[:, :, 3] = ring_alpha * 255.0 * 0.9
+    glow[:, :, 3] = ring_alpha * 255.0 * HALO_STRENGTH
 
-    warm = np.array(WARM_RGB, dtype=np.float32)
     body = np.zeros_like(arr)
-    body[:, :, :3] = np.clip(arr[:, :, :3] * 0.84 + warm * 0.16, 0, 255)
+    body[:, :, :3] = sepia_tone(arr[:, :, :3])
     body[:, :, 3] = alpha * float(opacity)
 
     return Image.fromarray(_over(glow, body).astype(np.uint8), "RGBA")

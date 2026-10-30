@@ -8,7 +8,10 @@
  *   1. Draw the camera, mirrored, like a mirror over the altar.
  *   2. Float the ancestor with the same sine as ofrenda/ghost.py `float_offset`
  *      (negative y is up; the side drift uses period * 1.7).
- *   3. Leave a memory on a paper slip beside them.
+ *   3. Fade them in slowly, then let their light breathe a little, like a candle.
+ *      The sprite already carries its low opacity (ofrenda/ghost.py); the fade
+ *      and flicker here only ever dim it further, never brighten it.
+ *   4. Leave a memory on a paper slip beside them.
  *
  * If there is no camera, they stand in a painted night instead. Still a visit.
  */
@@ -17,9 +20,12 @@ const FALLBACK_MOTION = {
   amplitude_px: 10,
   period_s: 3.2,
   drift: 0.28,
-  opacity: 0.78,
+  opacity: 0.30,
   scale: 0.74,
   side: "right",
+  fade_in_s: 2.5,
+  flicker: 0.12,
+  flicker_period_s: 2.6,
 };
 
 let raf = 0;
@@ -82,6 +88,10 @@ function showMemory(person) {
 
 function loop(canvas, video, sprite, motion) {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const fadeMs = (motion.fade_in_s ?? 2.5) * 1000;
+  const flicker = reduced ? 0 : motion.flicker ?? 0.12;
+  const flickerPeriod = motion.flicker_period_s ?? 2.6;
+  let started = null;
   const tick = (now) => {
     const { ctx, width, height } = resizeCanvas(canvas);
     if (video && video.readyState >= 2) {
@@ -104,7 +114,14 @@ function loop(canvas, video, sprite, motion) {
     const margin = width * 0.06;
     const left = motion.side === "left" ? margin + x : width - targetW - margin + x;
     const top = height * 0.16 + y;
+    if (started === null) started = now;
+    const progress = reduced ? 1 : Math.min(1, (now - started) / fadeMs);
+    const fade = progress * progress * (3 - 2 * progress); // smoothstep
+    // Two slow waves that never line up, so it reads as flame, not a pulse.
+    const wave = 0.5 + 0.5 * (0.7 * Math.sin((2 * Math.PI * t) / flickerPeriod) + 0.3 * Math.sin((2 * Math.PI * t) / (flickerPeriod * 0.41)));
+    ctx.globalAlpha = fade * (1 - flicker * wave);
     ctx.drawImage(sprite, left, top, targetW, targetH);
+    ctx.globalAlpha = 1;
     raf = requestAnimationFrame(tick);
   };
   raf = requestAnimationFrame(tick);

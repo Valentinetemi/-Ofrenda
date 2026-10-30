@@ -31,6 +31,10 @@ from ofrenda.ghost import apply_ghost_treatment, feather_mask
 
 logger = logging.getLogger("ofrenda.segment")
 
+# Gaussian blur on the cut-out edge, in photo pixels. Wide enough that no
+# outline is visible once the figure is shown faintly.
+FEATHER_RADIUS = 4.0
+
 _lock = threading.Lock()
 _segmenter = None
 _segmenter_failed = False
@@ -147,7 +151,7 @@ def apply_alpha(image: Image.Image, mask: np.ndarray) -> Image.Image:
         resized = Image.fromarray(np.clip(mask * 255.0, 0, 255).astype(np.uint8), "L")
         resized = resized.resize((width, height), Image.Resampling.BILINEAR)
         mask = np.asarray(resized).astype(np.float32) / 255.0
-    soft = feather_mask(mask, radius=2.0)
+    soft = feather_mask(mask, radius=FEATHER_RADIUS)
     rgba[:, :, 3] = (rgba[:, :, 3].astype(np.float32) * np.clip(soft, 0, 1)).astype(np.uint8)
     return Image.fromarray(rgba, "RGBA")
 

@@ -9,6 +9,7 @@ from ofrenda import segment as segment_module
 from ofrenda.ghost import (
     HALO_PAD,
     MOTION,
+    sepia_tone,
     apply_ghost_treatment,
     composite_beside,
     float_offset,
@@ -90,11 +91,12 @@ def test_ghost_treatment_is_translucent_and_has_a_marigold_halo():
     arr = np.asarray(ghost)
     center = HALO_PAD + 20
     alpha = int(arr[center, center, 3])
-    assert 160 <= alpha <= 230
+    assert 60 <= alpha <= 100  # about 30% opaque: a faint memory
     # Just outside the original square, the halo should be warm rather than red body.
     halo = arr[center, HALO_PAD + 4]
     assert halo[3] > 8
     assert int(halo[0]) > int(halo[2])
+    assert halo[3] < 60  # a glow, not a ring
 
 
 def test_composite_places_the_ghost_on_the_right_and_lifts_it():
@@ -114,3 +116,32 @@ def test_composite_places_the_ghost_on_the_right_and_lifts_it():
     assert xs.mean() > frame.width / 2
     risen_top = bright(risen)[0].min()
     assert ys.min() - risen_top == MOTION["amplitude_px"]
+
+
+def test_ghost_is_sepia_not_cartoon_colour():
+    image = Image.new("RGBA", (40, 40), (0, 0, 0, 0))
+    ImageDraw.Draw(image).rectangle((10, 10, 29, 29), fill=(30, 60, 220, 255))  # saturated blue
+    arr = np.asarray(apply_ghost_treatment(image))
+    r, g, b = (int(v) for v in arr[HALO_PAD + 20, HALO_PAD + 20, :3])
+    assert r > g > b  # warm brown, the blue is gone
+
+
+def test_sepia_tone_is_monotonic_in_brightness():
+    dark = sepia_tone(np.array([[20.0, 20.0, 20.0]], dtype=np.float32))
+    light = sepia_tone(np.array([[200.0, 200.0, 200.0]], dtype=np.float32))
+    assert light.sum() > dark.sum()
+
+
+def test_ghost_is_faint_and_fades_in():
+    assert 0.2 <= MOTION["opacity"] <= 0.35
+    assert 2.0 <= MOTION["fade_in_s"] <= 3.0
+    script = (ROOT / "static" / "js" / "ghost.js").read_text(encoding="utf-8")
+    assert "fade_in_s" in script and "globalAlpha" in script
+
+
+def test_cutout_edge_is_feathered():
+    cutout, _method = segment_person(_figure(), Path("/no/such/model.tflite"))
+    alpha = np.asarray(cutout)[:, :, 3]
+    # A hard cut-out is almost all 0 or 255. A feathered one has a real ramp.
+    ramp = np.mean((alpha > 20) & (alpha < 235))
+    assert ramp > 0.02
